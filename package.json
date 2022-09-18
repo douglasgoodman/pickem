@@ -1,0 +1,15 @@
+{
+    "name": "pickem",
+    "packageManager": "yarn@3.2.3",
+    "workspaces": [
+        "functions/*"
+    ],
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    },
+    "scripts": {
+        "build": "yarn workspaces foreach run build",
+        "typecheck": "yarn workspaces foreach run typecheck"
+    }
+}
