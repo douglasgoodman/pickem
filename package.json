@@ -11,5 +11,8 @@
     "scripts": {
         "build": "yarn workspaces foreach run build",
         "typecheck": "yarn workspaces foreach run typecheck"
+    },
+    "devDependencies": {
+        "typescript": "^4.8.3"
     }
 }
