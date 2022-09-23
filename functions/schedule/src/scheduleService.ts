@@ -1,6 +1,6 @@
 import Axios from 'axios';
-import { join } from 'path';
-import { writeFileSync } from 'fs';
+import { putSeasonDocument } from './storageService';
+import { Game, GameStatus, SeasonDocument, Team, Week } from './storageTypes';
 
 enum CalendarType {
     Preseason = '1',
@@ -63,6 +63,8 @@ export async function updateCurrentYearSchedule() {
     // get game matchups for each week and update doc - home teams and away team, date and time
     const { data: scoreboard } = await Axios.get<Scoreboard>(scoreboardUrl);
 
+    console.log('got scoreboard!');
+
     const preseasonWeeks = await convertCalendarToWeeks(
         scoreboard.leagues[0].calendar.find(
             (c) => c.value === CalendarType.Preseason
@@ -79,14 +81,15 @@ export async function updateCurrentYearSchedule() {
         )!
     );
 
-    const season: Season = {
+    const season: SeasonDocument = {
         isCurrent: true,
         year: scoreboard.season.year,
         weeks: [...preseasonWeeks, ...regularSeasonWeeks, ...postseasonWeeks],
     };
 
-    const path = join(__dirname, 'season.json');
-    writeFileSync(path, JSON.stringify(season));
+    console.log(`Result: ${JSON.stringify(season)}`);
+
+    await putSeasonDocument(season);
 }
 
 async function convertCalendarToWeeks(calendar: Calendar): Promise<Week[]> {
@@ -94,6 +97,10 @@ async function convertCalendarToWeeks(calendar: Calendar): Promise<Week[]> {
     for (const week of calendar.entries) {
         const { data: weekScoreboard } = await Axios.get<Scoreboard>(
             `${scoreboardUrl}?seasontype=${calendar.value}&week=${week.value}`
+        );
+
+        console.log(
+            `got scoreboard for seasontype=${calendar.value} and week=${week.value}`
         );
 
         const games: Game[] = [];
@@ -147,37 +154,4 @@ function convertCompetitorToTeam(competitor: Competitor): Team {
         abbreviation: competitor.team.abbreviation,
         imageUrl: competitor.team.logo,
     };
-}
-
-export interface Season {
-    isCurrent: boolean;
-    year: number;
-    weeks: Week[];
-}
-
-export interface Week {
-    number: string;
-    isPreseason: boolean;
-    isRegularSeason: boolean;
-    isPostseason: boolean;
-    games: Game[];
-}
-
-export type GameStatus = 'future' | 'inProgress' | 'complete';
-
-export interface Game {
-    dateTime: string; // "2022-08-01T07:00Z"
-    status: GameStatus;
-    home: Team;
-    away: Team;
-    homeScore?: number;
-    awayScore?: number;
-    homeSpread?: number;
-    awaySpread?: number;
-}
-
-export interface Team {
-    name: string;
-    abbreviation: string;
-    imageUrl: string;
 }
