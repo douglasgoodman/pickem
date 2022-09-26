@@ -2,12 +2,17 @@
     "name": "@pickem/schedule-function",
     "packageManager": "yarn@3.2.3",
     "dependencies": {
-        "aws-sdk": "^2.1222.0",
+        "@aws-sdk/client-dynamodb": "^3.179.0",
+        "@aws-sdk/lib-dynamodb": "^3.179.0",
+        "@aws-sdk/smithy-client": "^3.178.0",
+        "@aws-sdk/types": "^3.178.0",
         "axios": "^0.27.2"
     },
     "devDependencies": {
+        "@types/archiver": "^5",
         "@types/aws-lambda": "^8.10.104",
         "@types/node": "^18.7.18",
+        "archiver": "^5.3.1",
         "esbuild": "^0.15.8",
         "nodemon": "^2.0.20",
         "ts-node": "^10.9.1",
@@ -15,8 +20,8 @@
     },
     "scripts": {
         "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
-        "build:image": "yarn docker build",
-        "package": "cd dist && 7z a index.zip *",
+        "package": "ts-node scripts/package.ts",
+        "deploy": "aws lambda update-function-code --function-name hello-world --zip-file fileb://dist/index.zip",
         "typecheck": "tsc"
     }
 }
