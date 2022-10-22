@@ -2,7 +2,10 @@
     "name": "pickem",
     "packageManager": "yarn@3.2.3",
     "workspaces": [
-        "functions/*"
+        "api",
+        "functions/*",
+        "libs/*",
+        "web"
     ],
     "prettier": {
         "tabWidth": 4,
