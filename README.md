@@ -1,2 +1,1 @@
-# pickem
-NFL Pick em League
+# picks
