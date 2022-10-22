@@ -2,6 +2,7 @@ import Axios from 'axios';
 import {
     Game,
     GameStatus,
+    Odds,
     SeasonDocument,
     Team,
     Week,
@@ -15,6 +16,10 @@ enum CalendarType {
 
 const scoreboardUrl =
     'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard';
+
+const mgmOddsProviderId = 47;
+const getOddsUrl = (eventId: string) =>
+    `https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/${eventId}/competitions/${eventId}/odds/${mgmOddsProviderId}`;
 
 interface EventStatus {
     type: {
@@ -63,6 +68,19 @@ interface Scoreboard {
     }[];
 }
 
+interface TeamOdds {
+    favorite: boolean;
+    underdog: boolean;
+}
+
+interface RawOdds {
+    details: string;
+    overUnder: number;
+    spread: number;
+    awayTeamOdds: TeamOdds;
+    homeTeamOdds: TeamOdds;
+}
+
 export async function getScheduleAsSeasonDocument(): Promise<SeasonDocument> {
     const { data: scoreboard } = await Axios.get<Scoreboard>(scoreboardUrl);
 
@@ -98,6 +116,12 @@ async function convertCalendarToWeeks(calendar: Calendar): Promise<Week[]> {
             `${scoreboardUrl}?seasontype=${calendar.value}&week=${week.value}`
         );
 
+        const now = new Date();
+        const getOdds =
+            now > new Date(week.startDate) &&
+            now < new Date(week.endDate) &&
+            now.getDay() === 3;
+
         const games: Game[] = [];
 
         for (const event of weekScoreboard.events) {
@@ -107,7 +131,25 @@ async function convertCalendarToWeeks(calendar: Calendar): Promise<Week[]> {
             const awayCompetitor = event.competitions[0].competitors.find(
                 (c) => c.homeAway === 'away'
             )!;
+
+            let odds: Odds | undefined;
+            if (getOdds) {
+                const url = getOddsUrl(event.id);
+                const { data: rawOdds } = await Axios.get<RawOdds>(url);
+                odds = {
+                    details: rawOdds.details,
+                    overUnder: rawOdds.overUnder,
+                    homeSpread: rawOdds.homeTeamOdds.favorite
+                        ? rawOdds.spread
+                        : rawOdds.spread * -1,
+                    awaySpread: rawOdds.awayTeamOdds.favorite
+                        ? rawOdds.spread
+                        : rawOdds.spread * -1,
+                };
+            }
+
             games.push({
+                id: event.id,
                 dateTime: event.date,
                 status: convertEventStatusToGameStatus(
                     event.competitions[0].status
@@ -116,6 +158,7 @@ async function convertCalendarToWeeks(calendar: Calendar): Promise<Week[]> {
                 away: convertCompetitorToTeam(awayCompetitor),
                 homeScore: +homeCompetitor.score,
                 awayScore: +awayCompetitor.score,
+                odds,
             });
         }
 

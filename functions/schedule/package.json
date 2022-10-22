@@ -22,6 +22,7 @@
         "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
         "package": "ts-node scripts/package.ts",
         "deploy": "aws lambda update-function-code --function-name hello-world --zip-file fileb://dist/index.zip",
-        "typecheck": "tsc"
+        "typecheck": "tsc",
+        "run-local": "ts-node src/local.ts --updateSchedule"
     }
 }

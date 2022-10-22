@@ -15,18 +15,25 @@ export interface Week {
 export type GameStatus = 'future' | 'inProgress' | 'complete';
 
 export interface Game {
+    id: string;
     dateTime: string; // "2022-08-01T07:00Z"
     status: GameStatus;
     home: Team;
     away: Team;
     homeScore?: number;
     awayScore?: number;
-    homeSpread?: number;
-    awaySpread?: number;
+    odds?: Odds;
 }
 
 export interface Team {
     name: string;
     abbreviation: string;
     imageUrl: string;
+}
+
+export interface Odds {
+    details: string;
+    homeSpread: number;
+    awaySpread: number;
+    overUnder: number;
 }

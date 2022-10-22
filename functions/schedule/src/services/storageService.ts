@@ -5,7 +5,9 @@ import { SeasonDocument } from './storageTypes';
 export async function putSeasonDocument(season: SeasonDocument): Promise<void> {
     const dynamo = new DynamoDBClient({ region: 'us-east-1' });
     console.log('created dynamo db client');
-    const documentClient = DynamoDBDocument.from(dynamo);
+    const documentClient = DynamoDBDocument.from(dynamo, {
+        marshallOptions: { removeUndefinedValues: true },
+    });
     console.log('created dynamo db document client');
     try {
         const response = await documentClient.put({
