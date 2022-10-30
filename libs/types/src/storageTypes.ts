@@ -37,3 +37,13 @@ export interface Odds {
     awaySpread: number;
     overUnder: number;
 }
+
+export interface UserDocument {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    gender: string;
+    userImageUrl?: string;
+}

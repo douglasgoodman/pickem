@@ -2,6 +2,10 @@ import { serve, ServeOnRequestArgs } from 'esbuild';
 import process from 'node:process';
 import { baseBuildOptions } from './shared';
 import http from 'node:http';
+import path from 'node:path';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
 const rewritePaths = ['/signin', '/authcomplete'];
 
@@ -21,10 +25,11 @@ serve(
     }
 )
     .then(({ host, port }) => {
-        console.log(`Running at http://${host}:3002`);
+        console.log(
+            `Running at http://${process.env.DOMAIN}:${process.env.WEB_PORT}`
+        );
 
         http.createServer((req, res) => {
-            console.log(`--->> ${req.url}`);
             if (rewritePaths.includes(req.url!)) {
                 console.log(`REWRITE ${req.url} -----> /`);
                 req.url = '';
@@ -50,6 +55,6 @@ serve(
             });
 
             req.pipe(proxyReq, { end: true });
-        }).listen(3002);
+        }).listen(3000);
     })
     .catch(() => process.exit(1));

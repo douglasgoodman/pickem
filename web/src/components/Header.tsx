@@ -13,6 +13,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { AvatarWithName } from './AvatarWithName';
 import footballImage from '../images/football.png';
 import thumbsUpImage from '../images/thumbsup.png';
+import cameraImage from '../images/camera.png';
 
 export interface HeaderProps {
     paletteMode: PaletteMode;
@@ -35,14 +36,15 @@ export const Header: React.FC<HeaderProps> = ({
     return (
         <AppBar position="static">
             <Toolbar>
-                <Box component="img" src={thumbsUpImage} sx={imageSx} />
-                <Box component="img" src={footballImage} sx={imageSx} />
-                <Box component="img" src={footballImage} sx={imageSx} />
                 <Box
                     component="img"
                     src={thumbsUpImage}
                     sx={{ ...imageSx, transform: 'scaleX(-1)' }}
                 />
+                <Box component="img" src={footballImage} sx={imageSx} />
+                <Box component="img" src={footballImage} sx={imageSx} />
+                <Box component="img" src={thumbsUpImage} sx={imageSx} />
+                <Box component="img" src={cameraImage} sx={imageSx} />
                 <Typography
                     component="div"
                     sx={{ flexGrow: 1, marginLeft: '1rem' }}
@@ -51,9 +53,9 @@ export const Header: React.FC<HeaderProps> = ({
                 </Typography>
                 {!!user ? (
                     <AvatarWithName
-                        firstName={user.given_name}
-                        lastName={user.family_name}
-                        imageUrl={user.picture}
+                        firstName={user.firstName}
+                        lastName={user.lastName}
+                        imageUrl={user.userImageUrl}
                     />
                 ) : (
                     <Button onClick={signIn}>Sign in</Button>

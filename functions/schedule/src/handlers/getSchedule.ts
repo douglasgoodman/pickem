@@ -6,7 +6,7 @@ import {
     SeasonDocument,
     Team,
     Week,
-} from '../services/storageTypes';
+} from '@pickem/types';
 
 enum CalendarType {
     Preseason = '1',
@@ -121,6 +121,9 @@ async function convertCalendarToWeeks(calendar: Calendar): Promise<Week[]> {
             now > new Date(week.startDate) &&
             now < new Date(week.endDate) &&
             now.getDay() === 3;
+        if (getOdds) {
+            console.log("It's Wednesday, my dudes! Updating odds...");
+        }
 
         const games: Game[] = [];
 

@@ -1,22 +1,36 @@
-import { Router, Express } from 'express';
-import { RequestHandler } from 'express';
+import { Router, Express, RequestHandler } from 'express';
 import { google } from 'googleapis';
+import { SessionUser } from './types';
+import { config } from '../config';
+import { getUserDocument, putUserDocument } from '../services/storageService';
+import { UserDocument } from '@pickem/types';
+import { uploadUserImage } from '../services/s3Service';
 
-const clientId =
-    '34015227771-o5e7k0j9rj6fqe5v91fngnnb4vv745ad.apps.googleusercontent.com';
-const clientSecret = 'no way';
-const redirectUri = 'http://localhost:3001/auth/complete';
+const redirectUri = `http://${config.domain}:${config.port}/auth/complete`;
 const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
 ];
+const { id: clientId, secret: clientSecret } = config.googleOauthClient;
 
 export function addAuthRouter(app: Express) {
     const authRouter = Router();
+    authRouter.get('/fetch', authFetchHandler);
     authRouter.get('/start', authStartHandler);
     authRouter.get('/complete', authCompleteHandler);
+    authRouter.get('/signout', signOutHandler);
     app.use('/auth', authRouter);
 }
+
+export const authFetchHandler: RequestHandler = async (req, res) => {
+    console.log(JSON.stringify(req.session));
+    if (!req.session?.user?.id) {
+        res.send(401);
+        return;
+    }
+    const userDocument = await getUserDocument(req.session.user.id);
+    res.json(userDocument);
+};
 
 export const authStartHandler: RequestHandler = (req, res) => {
     const oauth2Client = new google.auth.OAuth2({
@@ -25,10 +39,12 @@ export const authStartHandler: RequestHandler = (req, res) => {
         redirectUri,
     });
 
+    const loginHint = req.query.hint as string;
     const authorizationUrl = oauth2Client.generateAuthUrl({
         scope: scopes,
         include_granted_scopes: true,
         state: 'some state',
+        login_hint: loginHint,
     });
     res.redirect(authorizationUrl);
 };
@@ -61,12 +77,32 @@ export const authCompleteHandler: RequestHandler = async (req, res) => {
     }
 
     const oauth2 = google.oauth2('v2');
-    const { data } = await oauth2.userinfo.get(
-        {
-            oauth_token: tokens.access_token!,
-        },
-        {}
-    );
-    const dataString = JSON.stringify(data);
-    res.redirect(`http://localhost:3002/authcomplete?data=${dataString}`);
+    const { data: userInfo } = await oauth2.userinfo.get({
+        oauth_token: tokens.access_token!,
+    });
+
+    const userDocument: UserDocument = {
+        id: userInfo.id!,
+        email: userInfo.email!,
+        firstName: userInfo.given_name!,
+        lastName: userInfo.family_name!,
+        fullName: userInfo.name!,
+        gender: userInfo.gender!,
+    };
+
+    if (userInfo.picture) {
+        const url = await uploadUserImage(userDocument.id, userInfo.picture);
+        if (!!url) {
+            userDocument.userImageUrl = url;
+        }
+    }
+
+    await putUserDocument(userDocument);
+
+    const user: SessionUser = { id: userInfo.id!, email: userInfo.email! };
+    req.session!.user = user;
+
+    res.redirect(`http://${config.domain}:${config.webPort}/authcomplete`);
 };
+
+export const signOutHandler: RequestHandler = async (req, res) => {};

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Router } from './routes/Router';
-
 import { Header } from './components/Header';
 import { AuthContextProvider } from './context/AuthContextProvider';
 import {

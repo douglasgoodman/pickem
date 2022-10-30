@@ -1,16 +1,28 @@
 import React from 'react';
-import { AuthContext, AuthContextType, User } from './AuthContext';
+import { AuthContext, AuthContextType } from './AuthContext';
 import { HasChildren } from '../types';
+import { environment } from '../environment';
+import { UserDocument } from '@pickem/types';
+import { useAsync } from 'react-async-hook';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
-const authStartUrl = 'http://localhost:3001/auth/start';
-const signOutUrl = 'http://localhost:3001/auth/signout';
+const authStartUrl = `${environment.apiHost}/auth/start`;
+const signOutUrl = `${environment.apiHost}/auth/signout`;
 
 export type AuthContextProviderProps = HasChildren;
 
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     children,
 }) => {
-    const [user, setUser] = React.useState<User>();
+    const [user, setUser] = React.useState<UserDocument>();
+
+    const rrr = useAsync(async () => {
+        const fetchUrl = `${environment.apiHost}/auth/fetch`;
+        const response = await fetch(fetchUrl, { credentials: 'include' });
+        const json = await response.json();
+        const userDocument = json.user as UserDocument;
+        setUser(userDocument);
+    }, []);
 
     const signIn = () => {
         location.href = authStartUrl;
@@ -28,6 +40,10 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     };
 
     return (
-        <AuthContext.Provider value={context}>{children}</AuthContext.Provider>
+        <LoadingOverlay isLoading={rrr.loading}>
+            <AuthContext.Provider value={context}>
+                {children}
+            </AuthContext.Provider>
+        </LoadingOverlay>
     );
 };

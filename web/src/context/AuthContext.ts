@@ -1,24 +1,11 @@
 import React from 'react';
-
-export interface User {
-    email: string;
-    family_name: string;
-    gender?: string | null;
-    given_name: string;
-    hd?: string | null;
-    id: string;
-    link?: string | null;
-    locale?: string | null;
-    name: string;
-    picture?: string | undefined;
-    verified_email?: boolean | null;
-}
+import { UserDocument } from '@pickem/types';
 
 export interface AuthContextType {
-    user: User | undefined;
+    user: UserDocument | undefined;
     signIn: () => void;
     signOut: () => void;
-    setAuthenticatedUser: (user: User) => void;
+    setAuthenticatedUser: (user: UserDocument) => void;
 }
 
 const notMountedFunction = () => {
