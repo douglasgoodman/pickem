@@ -1,12 +1,15 @@
-import { Router, Express, RequestHandler } from 'express';
+import { Router, Express, RequestHandler, response } from 'express';
 import { google } from 'googleapis';
-import { SessionUser } from './types';
 import { config } from '../config';
 import { getUserDocument, putUserDocument } from '../services/storageService';
 import { UserDocument } from '@pickem/types';
 import { uploadUserImage } from '../services/s3Service';
+import { randomBytes } from 'node:crypto';
+import { _Error } from '@aws-sdk/client-s3';
 
-const redirectUri = `http://${config.domain}:${config.port}/auth/complete`;
+const authRedirectUrl = `https://${config.apiDomain}/auth/redirect`;
+const authCompleteUri = `https://${config.apiDomain}/auth/complete`;
+
 const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
@@ -17,6 +20,7 @@ export function addAuthRouter(app: Express) {
     const authRouter = Router();
     authRouter.get('/fetch', authFetchHandler);
     authRouter.get('/start', authStartHandler);
+    authRouter.get('/redirect', authRedirectHandler);
     authRouter.get('/complete', authCompleteHandler);
     authRouter.get('/signout', signOutHandler);
     app.use('/auth', authRouter);
@@ -24,8 +28,8 @@ export function addAuthRouter(app: Express) {
 
 export const authFetchHandler: RequestHandler = async (req, res) => {
     console.log(JSON.stringify(req.session));
-    if (!req.session?.user?.id) {
-        res.send(401);
+    if (!req.session?.user) {
+        res.sendStatus(401);
         return;
     }
     const userDocument = await getUserDocument(req.session.user.id);
@@ -33,20 +37,35 @@ export const authFetchHandler: RequestHandler = async (req, res) => {
 };
 
 export const authStartHandler: RequestHandler = (req, res) => {
+    if (!req.session) {
+        res.sendStatus(401);
+        return;
+    }
+
     const oauth2Client = new google.auth.OAuth2({
         clientId,
         clientSecret,
-        redirectUri,
+        redirectUri: authCompleteUri,
     });
 
     const loginHint = req.query.hint as string;
-    const authorizationUrl = oauth2Client.generateAuthUrl({
+    const nonce = randomBytes(16).toString('base64');
+    const authStartUrl = oauth2Client.generateAuthUrl({
         scope: scopes,
         include_granted_scopes: true,
-        state: 'some state',
+        state: nonce,
         login_hint: loginHint,
     });
-    res.redirect(authorizationUrl);
+    req.session.auth = { nonce, authStartUrl };
+    res.json({ url: authRedirectUrl });
+};
+
+export const authRedirectHandler: RequestHandler = async (req, res) => {
+    if (!req.session?.auth?.authStartUrl) {
+        res.sendStatus(401);
+        return;
+    }
+    res.redirect(req.session.auth.authStartUrl);
 };
 
 export const authCompleteHandler: RequestHandler = async (req, res) => {
@@ -55,20 +74,27 @@ export const authCompleteHandler: RequestHandler = async (req, res) => {
         console.error(error);
     }
 
-    const state = req.query.state;
-    if (state !== 'some state') {
-        console.error('state: ' + state);
+    if (!req.session?.auth) {
+        res.sendStatus(401);
+        return;
+    }
+
+    if (req.query.state !== req.session.auth.nonce) {
+        res.sendStatus(401);
+        return;
     }
 
     const code = req.query.code as string;
     if (!code || typeof code !== 'string') {
         console.error('no code?');
+        res.sendStatus(401);
+        return;
     }
 
     const oauth2Client = new google.auth.OAuth2({
         clientId,
         clientSecret,
-        redirectUri,
+        redirectUri: authCompleteUri,
     });
 
     const { tokens } = await oauth2Client.getToken(code);
@@ -99,10 +125,18 @@ export const authCompleteHandler: RequestHandler = async (req, res) => {
 
     await putUserDocument(userDocument);
 
-    const user: SessionUser = { id: userInfo.id!, email: userInfo.email! };
-    req.session!.user = user;
+    req.session.auth = undefined;
 
-    res.redirect(`http://${config.domain}:${config.webPort}/authcomplete`);
+    req.session!.user = {
+        id: userInfo.id!,
+        email: userInfo.email!,
+        accessToken: tokens.access_token!,
+    };
+
+    res.redirect(`https://${config.webDomain}`);
 };
 
-export const signOutHandler: RequestHandler = async (req, res) => {};
+export const signOutHandler: RequestHandler = async (req, res) => {
+    req.session = null;
+    res.sendStatus(200);
+};

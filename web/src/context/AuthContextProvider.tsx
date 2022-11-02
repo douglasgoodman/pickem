@@ -6,8 +6,9 @@ import { UserDocument } from '@pickem/types';
 import { useAsync } from 'react-async-hook';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 
-const authStartUrl = `${environment.apiHost}/auth/start`;
-const signOutUrl = `${environment.apiHost}/auth/signout`;
+const authFetchUrl = `${environment.apiDomain}/auth/fetch`;
+const authStartUrl = `${environment.apiDomain}/auth/start`;
+const signOutUrl = `${environment.apiDomain}/auth/signout`;
 
 export type AuthContextProviderProps = HasChildren;
 
@@ -16,20 +17,22 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 }) => {
     const [user, setUser] = React.useState<UserDocument>();
 
-    const rrr = useAsync(async () => {
-        const fetchUrl = `${environment.apiHost}/auth/fetch`;
-        const response = await fetch(fetchUrl, { credentials: 'include' });
+    const { loading } = useAsync(async () => {
+        const response = await fetch(authFetchUrl, { credentials: 'include' });
         const json = await response.json();
         const userDocument = json.user as UserDocument;
         setUser(userDocument);
     }, []);
 
-    const signIn = () => {
-        location.href = authStartUrl;
+    const signIn = async () => {
+        const response = await fetch(authStartUrl, { credentials: 'include' });
+        const responseObject = await response.json();
+        location.href = responseObject.url;
     };
 
-    const signOut = () => {
-        location.href = signOutUrl;
+    const signOut = async () => {
+        await fetch(signOutUrl, { credentials: 'include' });
+        location.href = '/';
     };
 
     const context: AuthContextType = {
@@ -40,7 +43,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     };
 
     return (
-        <LoadingOverlay isLoading={rrr.loading}>
+        <LoadingOverlay isLoading={loading}>
             <AuthContext.Provider value={context}>
                 {children}
             </AuthContext.Provider>

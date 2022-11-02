@@ -1,11 +1,9 @@
 interface Environment {
-    domain: string;
-    apiPort: string;
-    apiHost: string;
+    webDomain: string;
+    apiDomain: string;
 }
 
 export const environment: Environment = {
-    domain: DOMAIN,
-    apiPort: API_PORT,
-    apiHost: `http://${DOMAIN}:${API_PORT}`,
+    webDomain: `https://www.${DOMAIN}`,
+    apiDomain: `https://api.${DOMAIN}`,
 };

@@ -25,9 +25,7 @@ serve(
     }
 )
     .then(({ host, port }) => {
-        console.log(
-            `Running at http://${process.env.DOMAIN}:${process.env.WEB_PORT}`
-        );
+        console.log(`Running at https://www.${process.env.DOMAIN}`);
 
         http.createServer((req, res) => {
             if (rewritePaths.includes(req.url!)) {

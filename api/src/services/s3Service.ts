@@ -29,7 +29,7 @@ export async function uploadUserImage(
             Body: response.data,
         });
         await client.send(command);
-        return `http://${config.domain}:${config.port}/user/image`;
+        return `https://${config.apiDomain}/user/image`;
     } catch (e) {
         console.error(e);
         return undefined;

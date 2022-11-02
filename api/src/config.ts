@@ -1,7 +1,7 @@
 interface Config {
-    domain: string;
+    apiDomain: string;
+    webDomain: string;
     port: number;
-    webPort: number;
     googleOauthClient: {
         id: string;
         secret: string;
@@ -9,17 +9,23 @@ interface Config {
     aws: {
         region: string;
     };
+    session: {
+        secret: string;
+    };
 }
 
 export const config: Config = {
-    domain: process.env.DOMAIN!,
+    apiDomain: `api.${process.env.DOMAIN!}`,
+    webDomain: `www.${process.env.DOMAIN!}`,
     port: +process.env.API_PORT!,
-    webPort: +process.env.WEB_PORT!,
     googleOauthClient: {
         id: process.env.GOOGLE_OAUTH_CLIENT_ID!,
         secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET!,
     },
     aws: {
         region: process.env.AWS_REGION!,
+    },
+    session: {
+        secret: process.env.SESSION_SECRET!,
     },
 };

@@ -1,5 +1,4 @@
 import { Express, RequestHandler, Router } from 'express';
-import { Readable } from 'node:stream';
 import { getUserImage } from '../services/s3Service';
 
 export function addUserRouter(app: Express) {
@@ -19,7 +18,5 @@ export const userImageHandler: RequestHandler = async (req, res) => {
         res.send(500);
         return;
     }
-    //res.contentType('png');
-    image?.pipe(res);
-    //image?.on('end', () => res.end());
+    image.pipe(res);
 };
