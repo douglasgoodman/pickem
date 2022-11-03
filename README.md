@@ -10,4 +10,4 @@
 
 ## Links
 
--   [https://medium.com/@devahmedshendy/traditional-setup-run-local-development-over-https-using-caddy-964884e75232][local development with caddy]
+-   [local development with Caddy](https://medium.com/@devahmedshendy/traditional-setup-run-local-development-over-https-using-caddy-964884e75232)
