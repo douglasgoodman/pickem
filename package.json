@@ -2,7 +2,10 @@
     "name": "pickem",
     "packageManager": "yarn@3.2.3",
     "workspaces": [
-        "functions/*"
+        "api",
+        "functions/*",
+        "libs/*",
+        "web"
     ],
     "prettier": {
         "tabWidth": 4,
@@ -10,6 +13,7 @@
     },
     "scripts": {
         "build": "yarn workspaces foreach run build",
+        "proxy": "caddy run",
         "typecheck": "yarn workspaces foreach run typecheck"
     },
     "devDependencies": {

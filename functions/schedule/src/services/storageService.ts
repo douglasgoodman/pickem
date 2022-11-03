@@ -1,6 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
-import { SeasonDocument } from './storageTypes';
+import { SeasonDocument } from '@pickem/types';
 
 export async function putSeasonDocument(season: SeasonDocument): Promise<void> {
     const dynamo = new DynamoDBClient({ region: 'us-east-1' });
@@ -18,12 +18,15 @@ export async function putSeasonDocument(season: SeasonDocument): Promise<void> {
             },
         });
         console.log(
-            `Successfully put season document: ${JSON.stringify(response)}`
+            `Put season document successful: ${JSON.stringify(response)}`
         );
     } catch (error) {
         console.error(
             `Error updating season in dynamodb: ${JSON.stringify(error)}`
         );
         throw error;
+    } finally {
+        documentClient.destroy();
+        dynamo.destroy();
     }
 }
