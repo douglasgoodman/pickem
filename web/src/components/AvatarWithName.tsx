@@ -4,6 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useIsMobileUi } from '../hooks/useIsMobileUi';
 
 export interface AvatarWithNameProps {
     firstName: string;
@@ -18,12 +19,15 @@ export const AvatarWithName: React.FC<AvatarWithNameProps> = ({
     imageUrl,
     onClick,
 }) => {
+    const { isMobileUi } = useIsMobileUi();
     const name = `${firstName} ${lastName}`;
     const initials = `${firstName[0]}${lastName[0]}`;
 
     return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography sx={{ marginRight: '1rem' }}>{name}</Typography>
+            {!isMobileUi && (
+                <Typography sx={{ marginRight: '1rem' }}>{name}</Typography>
+            )}
             <Tooltip title="Account settings">
                 <IconButton onClick={onClick}>
                     <Avatar alt={name} src={imageUrl}>

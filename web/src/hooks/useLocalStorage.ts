@@ -1,4 +1,4 @@
-export type StorageKey = 'paletteMode';
+export type StorageKey = 'paletteMode' | 'signInHint';
 
 export const useLocalStorage = () => {
     return {

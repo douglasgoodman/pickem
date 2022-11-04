@@ -17,6 +17,9 @@ import Tooltip from '@mui/material/Tooltip';
 import footballImage from '../images/football.png';
 import thumbsUpImage from '../images/thumbsup.png';
 import cameraImage from '../images/camera.png';
+import { useIsMobileUi } from '../hooks/useIsMobileUi';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 
 export interface HeaderProps {
     paletteMode: PaletteMode;
@@ -27,7 +30,8 @@ export const Header: React.FC<HeaderProps> = ({
     paletteMode,
     togglePaletteMode,
 }) => {
-    const { user, signOut } = useAuthContext();
+    const { isMobileUi } = useIsMobileUi();
+    const { user, signOut, inProgress } = useAuthContext();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const open = Boolean(anchorEl);
 
@@ -41,25 +45,35 @@ export const Header: React.FC<HeaderProps> = ({
         setAnchorEl(null);
     };
 
+    const handleMyAccountClick = () => {
+        setAnchorEl(null);
+    };
+
+    const handleSignOutClick = () => {
+        setAnchorEl(null);
+        signOut();
+    };
+
     return (
         <AppBar position="static">
-            <Toolbar>
-                <Box
-                    component="img"
-                    src={thumbsUpImage}
-                    sx={{ ...imageSx, transform: 'scaleX(-1)' }}
-                />
-                <Box component="img" src={footballImage} sx={imageSx} />
-                <Box component="img" src={footballImage} sx={imageSx} />
-                <Box component="img" src={thumbsUpImage} sx={imageSx} />
-                <Box component="img" src={cameraImage} sx={imageSx} />
-                <Typography
-                    component="div"
-                    sx={{ flexGrow: 1, marginLeft: '1rem' }}
-                >
-                    Send Picks
-                </Typography>
-                {!!user ? (
+            <Toolbar sx={{ padding: '0' }}>
+                <Stack direction="row" alignItems="center">
+                    <Box
+                        component="img"
+                        src={thumbsUpImage}
+                        sx={{ ...imageSx, transform: 'scaleX(-1)' }}
+                    />
+                    <Box component="img" src={footballImage} sx={imageSx} />
+                    <Box component="img" src={footballImage} sx={imageSx} />
+                    <Box component="img" src={thumbsUpImage} sx={imageSx} />
+                    <Box component="img" src={cameraImage} sx={imageSx} />
+                </Stack>
+                <Box sx={{ flexGrow: 1, marginLeft: '1rem' }}>
+                    {!isMobileUi && (
+                        <Typography variant="h4">Send Picks</Typography>
+                    )}
+                </Box>
+                {!!user && (
                     <>
                         <AvatarWithName
                             firstName={user.firstName}
@@ -72,28 +86,42 @@ export const Header: React.FC<HeaderProps> = ({
                             open={open}
                             onClose={handleAvatarMenuClose}
                         >
-                            <MenuItem>My account</MenuItem>
-                            <MenuItem onClick={signOut}>Sign out</MenuItem>
+                            <MenuItem onClick={handleMyAccountClick}>
+                                My account
+                            </MenuItem>
+                            {isMobileUi && (
+                                <MenuItem
+                                    onClick={togglePaletteMode}
+                                >{`Toggle ${
+                                    paletteMode === 'dark' ? 'light' : 'dark'
+                                } mode`}</MenuItem>
+                            )}
+                            <MenuItem onClick={handleSignOutClick}>
+                                Sign out
+                            </MenuItem>
                         </Menu>
                     </>
-                ) : (
-                    <Button component={RouterLink} to="/signin">
+                )}
+                {!inProgress && !user && (
+                    <Button color="inherit" component={RouterLink} to="/signin">
                         Sign in
                     </Button>
                 )}
-                <Tooltip
-                    title={`Toggle ${
-                        paletteMode === 'dark' ? 'light' : 'dark'
-                    } mode`}
-                >
-                    <IconButton size="large" onClick={togglePaletteMode}>
-                        {paletteMode === 'dark' ? (
-                            <Brightness7 />
-                        ) : (
-                            <Brightness4 />
-                        )}
-                    </IconButton>
-                </Tooltip>
+                {!isMobileUi && (
+                    <Tooltip
+                        title={`Toggle ${
+                            paletteMode === 'dark' ? 'light' : 'dark'
+                        } mode`}
+                    >
+                        <IconButton size="large" onClick={togglePaletteMode}>
+                            {paletteMode === 'dark' ? (
+                                <Brightness7 />
+                            ) : (
+                                <Brightness4 />
+                            )}
+                        </IconButton>
+                    </Tooltip>
+                )}
             </Toolbar>
         </AppBar>
     );

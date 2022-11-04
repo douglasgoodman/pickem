@@ -5,11 +5,15 @@ import { getSeasonDocument } from './services/storageService';
 import { config } from './config';
 import { addUserRouter } from './user/userRouter';
 import morgan from 'morgan';
+import bodyParser from 'body-parser';
+import { addLeagueRouter } from './league/leagueRouter';
 
 const app = express();
 app.set('trust proxy', true);
 
 app.use(morgan('tiny'));
+
+app.use(bodyParser.json());
 
 const expires = new Date();
 expires.setFullYear(expires.getFullYear() + 1);
@@ -28,6 +32,7 @@ app.get('/schedule', async (_req, res) => {
 
 addAuthRouter(app);
 addUserRouter(app);
+addLeagueRouter(app);
 
 app.get('/hi', (_, res) => {
     res.send('hello!!');

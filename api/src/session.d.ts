@@ -3,6 +3,7 @@ declare namespace CookieSessionInterfaces {
         auth?: {
             nonce: string;
             authStartUrl: string;
+            path?: string;
         };
         user?: {
             id: string;

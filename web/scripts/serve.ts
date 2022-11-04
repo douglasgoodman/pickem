@@ -7,7 +7,19 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
-const rewritePaths = ['/signin', '/authcomplete'];
+const ignorePaths = ['/fonts/', '/images/', '/js/', '/assets/'];
+const ignoreExtensions = [
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.js',
+    '.js.map',
+    '.css',
+    '.css.map',
+    '.ico',
+    '.woff',
+    '.woff2',
+];
 
 const logRequest = ({
     method,
@@ -28,12 +40,22 @@ serve(
         console.log(`Running at https://www.${process.env.DOMAIN}`);
 
         http.createServer((req, res) => {
-            if (rewritePaths.includes(req.url!)) {
-                console.log(`REWRITE ${req.url} -----> /`);
-                req.url = '';
-            }
+            let rewrite = true;
+            ignorePaths.forEach((path) => {
+                if (req.url?.startsWith(path)) {
+                    rewrite = false;
+                }
+            });
 
-            if (req.url?.startsWith('/authcomplete')) {
+            ignoreExtensions.forEach((extension) => {
+                if (req.url?.endsWith(extension)) {
+                    req.url = req.url.substring(req.url.lastIndexOf('/'));
+                    console.log('rewrite asset: ' + req.url);
+                    rewrite = false;
+                }
+            });
+
+            if (rewrite) {
                 console.log(`REWRITE ${req.url} -----> /`);
                 req.url = '';
             }
@@ -42,7 +64,6 @@ serve(
                 hostname: host,
                 port,
                 path: req.url,
-
                 method: req.method,
                 headers: req.headers,
             };

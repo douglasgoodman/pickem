@@ -9,12 +9,20 @@ import {
     ThemeProvider,
     useMediaQuery,
 } from '@mui/material';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { LoadingOverlay } from './components/LoadingOverlay';
 
 export const App: React.FC = () => {
+    const localStorage = useLocalStorage();
     const preferDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-    const [paletteMode, setPaletteMode] = React.useState<PaletteMode>(
-        preferDarkMode ? 'dark' : 'light'
-    );
+    const [paletteMode, setPaletteMode] = React.useState<PaletteMode>(() => {
+        const mode = localStorage.get<string>('paletteMode') as PaletteMode;
+        if (!!mode) {
+            return mode;
+        } else {
+            return preferDarkMode ? 'dark' : 'light';
+        }
+    });
 
     const theme = React.useMemo(
         () =>
@@ -25,7 +33,9 @@ export const App: React.FC = () => {
     );
 
     const togglePaletteMode = () => {
-        setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
+        const mode = paletteMode === 'dark' ? 'light' : 'dark';
+        setPaletteMode(mode);
+        localStorage.set<string>('paletteMode', mode);
     };
 
     return (

@@ -1,27 +1,51 @@
 import React from 'react';
 import Google from '@mui/icons-material/Google';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useAuthContext } from '../context/AuthContext';
 import { FlexFill } from '../components/FlexFill';
+import { useNavigate } from 'react-router-dom';
+import Container from '@mui/material/Container';
 
 export const SignIn: React.FC = () => {
-    const { signIn } = useAuthContext();
+    const { user, signIn } = useAuthContext();
+    const [inProgress, setInProgress] = React.useState(false);
+    const navigate = useNavigate();
+
+    React.useEffect(() => {
+        document.title = 'Send Picks - Sign in';
+    }, []);
+
+    const handleSignInClick = () => {
+        setInProgress(true);
+        signIn();
+    };
+
+    if (!!user) {
+        navigate('/');
+    }
 
     return (
-        <FlexFill
-            sx={{
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <Typography>
-                Send Picks uses your Google account for sign in.
-            </Typography>
-            <Button variant="contained" startIcon={<Google />} onClick={signIn}>
-                Sign in with Google
-            </Button>
-        </FlexFill>
+        <Container>
+            <FlexFill
+                sx={{
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography>
+                    Send Picks uses your Google account for sign in.
+                </Typography>
+                <LoadingButton
+                    loading={inProgress}
+                    variant="contained"
+                    startIcon={<Google />}
+                    onClick={handleSignInClick}
+                >
+                    Sign in with Google
+                </LoadingButton>
+            </FlexFill>
+        </Container>
     );
 };

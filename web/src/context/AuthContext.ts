@@ -3,9 +3,9 @@ import { UserDocument } from '@pickem/types';
 
 export interface AuthContextType {
     user: UserDocument | undefined;
-    signIn: () => void;
+    inProgress: boolean | undefined;
+    signIn: (path?: string) => void;
     signOut: () => void;
-    setAuthenticatedUser: (user: UserDocument) => void;
 }
 
 const notMountedFunction = () => {
@@ -14,10 +14,11 @@ const notMountedFunction = () => {
 
 export const AuthContext = React.createContext<AuthContextType>({
     user: undefined,
+    inProgress: undefined,
     signIn: notMountedFunction,
     signOut: notMountedFunction,
-    setAuthenticatedUser: notMountedFunction,
 });
 
-export const useAuthContext = (): AuthContextType =>
-    React.useContext(AuthContext);
+export function useAuthContext(): AuthContextType {
+    return React.useContext(AuthContext);
+}

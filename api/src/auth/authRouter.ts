@@ -48,6 +48,7 @@ export const authStartHandler: RequestHandler = (req, res) => {
         redirectUri: authCompleteUri,
     });
 
+    const path = req.query.path as string;
     const loginHint = req.query.hint as string;
     const nonce = randomBytes(16).toString('base64');
     const authStartUrl = oauth2Client.generateAuthUrl({
@@ -56,7 +57,7 @@ export const authStartHandler: RequestHandler = (req, res) => {
         state: nonce,
         login_hint: loginHint,
     });
-    req.session.auth = { nonce, authStartUrl };
+    req.session.auth = { nonce, authStartUrl, path };
     res.json({ url: authRedirectUrl });
 };
 
@@ -125,6 +126,7 @@ export const authCompleteHandler: RequestHandler = async (req, res) => {
 
     await putUserDocument(userDocument);
 
+    const path = req.session.auth.path ?? '/';
     req.session.auth = undefined;
 
     req.session!.user = {
@@ -133,7 +135,7 @@ export const authCompleteHandler: RequestHandler = async (req, res) => {
         accessToken: tokens.access_token!,
     };
 
-    res.redirect(`https://${config.webDomain}`);
+    res.redirect(`https://${config.webDomain}${path}`);
 };
 
 export const signOutHandler: RequestHandler = async (req, res) => {
