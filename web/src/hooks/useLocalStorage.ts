@@ -11,6 +11,10 @@ export const useLocalStorage = () => {
             return value as T;
         },
         set<T>(key: StorageKey, value: T) {
+            if (!value) {
+                localStorage.removeItem(key);
+                return;
+            }
             localStorage.setItem(key, JSON.stringify(value));
         },
         remove(key: StorageKey) {

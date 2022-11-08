@@ -4,6 +4,7 @@ import {
     GetObjectCommand,
     GetObjectCommandOutput,
 } from '@aws-sdk/client-s3';
+import { UserRoute } from '@pickem/api-sdk';
 import axios from 'axios';
 import { Readable } from 'node:stream';
 import { config } from '../config';
@@ -29,7 +30,7 @@ export async function uploadUserImage(
             Body: response.data,
         });
         await client.send(command);
-        return `https://${config.apiDomain}/user/image`;
+        return `https://${config.apiDomain}${UserRoute.image}`;
     } catch (e) {
         console.error(e);
         return undefined;

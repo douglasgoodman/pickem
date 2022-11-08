@@ -24,6 +24,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import { toCanvas } from 'qrcode';
 import Box from '@mui/material/Box';
+import { LeagueRoute } from '@pickem/api-sdk';
 
 export interface LeagueProps {
     join?: boolean;
@@ -57,12 +58,12 @@ export const CreateLeague: React.FC = () => {
         execute: createLeague,
         error,
     } = useAsyncCallback(async () => {
-        const response = await axiosInstance.post('/league/create', {
+        const response = await axiosInstance.post(LeagueRoute.create, {
             leagueName,
             maxPlayers,
         });
         setLeagueUrl(
-            `${environment.webDomain}/league/join/${response.data.id}`
+            `${environment.webDomain}${LeagueRoute.join}/${response.data.id}`
         );
     });
 

@@ -18,7 +18,6 @@ import footballImage from '../images/football.png';
 import thumbsUpImage from '../images/thumbsup.png';
 import cameraImage from '../images/camera.png';
 import { useIsMobileUi } from '../hooks/useIsMobileUi';
-import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 
 export interface HeaderProps {
@@ -57,7 +56,12 @@ export const Header: React.FC<HeaderProps> = ({
     return (
         <AppBar position="static">
             <Toolbar sx={{ padding: '0' }}>
-                <Stack direction="row" alignItems="center">
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    component={RouterLink}
+                    to="/"
+                >
                     <Box
                         component="img"
                         src={thumbsUpImage}

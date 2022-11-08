@@ -44,10 +44,8 @@ export async function getUserDocument(id: string): Promise<UserDocument> {
                 id,
             },
         });
-        console.log(
-            `Get user document successful: ${JSON.stringify(response)}`
-        );
-        return response.Item as UserDocument;
+        console.log('Get user document successful');
+        return response.Item?.user as UserDocument;
     } catch (error) {
         console.error(
             `Error getting user document from dynamodb: ${JSON.stringify(

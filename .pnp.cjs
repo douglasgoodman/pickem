@@ -29,6 +29,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:functions/schedule"\
       },\
       {\
+        "name": "@pickem/api-sdk",\
+        "reference": "workspace:libs/api-sdk"\
+      },\
+      {\
         "name": "@pickem/types",\
         "reference": "workspace:libs/types"\
       },\
@@ -41,6 +45,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
     "fallbackExclusionList": [\
       ["@pickem/api", ["workspace:api"]],\
+      ["@pickem/api-sdk", ["workspace:libs/api-sdk"]],\
       ["@pickem/schedule-function", ["workspace:functions/schedule"]],\
       ["@pickem/types", ["workspace:libs/types"]],\
       ["@pickem/web", ["workspace:web"]],\
@@ -2713,6 +2718,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/lib-dynamodb", "virtual:a489b209cbdb545f1d767f934f6af6057d3d45ae476343001eaca91c3c657585afaf7f4b6e5dc9812b8814ccf74ca90ebc3e305e08e5ca3e4567328c0b89a80e#npm:3.179.0"],\
             ["@aws-sdk/smithy-client", "npm:3.178.0"],\
             ["@aws-sdk/types", "npm:3.178.0"],\
+            ["@pickem/api-sdk", "workspace:libs/api-sdk"],\
             ["@pickem/types", "workspace:libs/types"],\
             ["@types/body-parser", "npm:1.19.2"],\
             ["@types/cookie-session", "npm:2.0.44"],\
@@ -2725,6 +2731,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["dotenv", "npm:16.0.3"],\
             ["esbuild", "npm:0.15.8"],\
             ["express", "npm:4.18.2"],\
+            ["google-auth-library", "npm:8.6.0"],\
             ["googleapis", "npm:108.0.0"],\
             ["morgan", "npm:1.10.0"],\
             ["nodemon", "npm:2.0.20"],\
@@ -2732,6 +2739,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tslib", "npm:2.4.0"],\
             ["typescript", "patch:typescript@npm%3A4.8.3#~builtin<compat/typescript>::version=4.8.3&hash=a1c5e5"],\
             ["unique-names-generator", "npm:4.7.1"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["@pickem/api-sdk", [\
+        ["workspace:libs/api-sdk", {\
+          "packageLocation": "./libs/api-sdk/",\
+          "packageDependencies": [\
+            ["@pickem/api-sdk", "workspace:libs/api-sdk"],\
+            ["typescript", "patch:typescript@npm%3A4.8.3#~builtin<compat/typescript>::version=4.8.3&hash=a1c5e5"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -2780,7 +2797,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@mui/icons-material", "virtual:31baa8f5ee0521afdee312cb46d7d4a408339f73be72a020a285f8083a4e788385e06b31d7555508429776568aba6e987449f0f91eb6db023d3ff600d8790b6d#npm:5.10.9"],\
             ["@mui/lab", "virtual:31baa8f5ee0521afdee312cb46d7d4a408339f73be72a020a285f8083a4e788385e06b31d7555508429776568aba6e987449f0f91eb6db023d3ff600d8790b6d#npm:5.0.0-alpha.106"],\
             ["@mui/material", "virtual:31baa8f5ee0521afdee312cb46d7d4a408339f73be72a020a285f8083a4e788385e06b31d7555508429776568aba6e987449f0f91eb6db023d3ff600d8790b6d#npm:5.10.12"],\
-            ["@pickem/types", "workspace:libs/types"],\
+            ["@pickem/api-sdk", "workspace:libs/api-sdk"],\
             ["@types/node", "npm:18.11.3"],\
             ["@types/qrcode", "npm:1.5.0"],\
             ["@types/react", "npm:18.0.21"],\

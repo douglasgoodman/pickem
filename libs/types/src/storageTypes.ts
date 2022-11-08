@@ -44,6 +44,5 @@ export interface UserDocument {
     firstName: string;
     lastName: string;
     fullName: string;
-    gender: string;
     userImageUrl?: string;
 }

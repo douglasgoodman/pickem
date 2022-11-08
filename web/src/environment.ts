@@ -4,6 +4,6 @@ interface Environment {
 }
 
 export const environment: Environment = {
-    webDomain: `https://www.${DOMAIN}`,
-    apiDomain: `https://api.${DOMAIN}`,
+    webDomain: `https://www.${process.env.DOMAIN}`,
+    apiDomain: `https://api.${process.env.DOMAIN}`,
 };

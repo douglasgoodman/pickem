@@ -15,7 +15,6 @@ export const baseBuildOptions: BuildOptions = {
     },
     logLevel: 'info',
     define: {
-        DOMAIN: JSON.stringify(process.env.DOMAIN),
-        API_PORT: JSON.stringify(process.env.API_PORT),
+        'process.env.DOMAIN': JSON.stringify(process.env.DOMAIN),
     },
 };

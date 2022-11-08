@@ -9,6 +9,7 @@ declare namespace CookieSessionInterfaces {
             id: string;
             email: string;
             accessToken: string;
+            idToken: string;
         };
     }
 }

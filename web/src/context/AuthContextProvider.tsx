@@ -3,13 +3,13 @@ import axios from 'axios';
 import { AuthContext, AuthContextType } from './AuthContext';
 import { HasChildren } from '../types';
 import { environment } from '../environment';
-import { UserDocument } from '@pickem/types';
 import { useAsync, useAsyncCallback } from 'react-async-hook';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-
-const authFetchUrl = '/auth/fetch';
-const authStartUrl = '/auth/start';
-const signOutUrl = '/auth/signout';
+import {
+    AuthFetchResponse,
+    AuthRoute,
+    AuthStartResponse,
+} from '@pickem/api-sdk';
 
 export type AuthContextProviderProps = HasChildren;
 
@@ -22,27 +22,23 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     children,
 }) => {
     const localStorage = useLocalStorage();
-    const [user, setUser] = React.useState<UserDocument>();
+    const [user, setUser] = React.useState<AuthFetchResponse>();
 
     const { loading: fetchInProgress } = useAsync(async () => {
-        const response = await axiosInstance.get<{ user: UserDocument }>(
-            authFetchUrl,
-            {
-                withCredentials: true,
-            }
+        const response = await axiosInstance.get<AuthFetchResponse>(
+            AuthRoute.fetch
         );
-        const userDocument = response.data.user;
-        localStorage.set<string>('signInHint', userDocument.email);
-        setUser(userDocument);
+        const userResponse = response.data;
+        localStorage.set<string>('signInHint', userResponse.email);
+        setUser(userResponse);
     }, []);
 
     const { loading: signInInProgress, execute: signIn } = useAsyncCallback(
         async (path?: string) => {
             const hint = localStorage.get<string>('signInHint');
-            const response = await axiosInstance.get<{ url: string }>(
-                authStartUrl,
+            const response = await axiosInstance.get<AuthStartResponse>(
+                AuthRoute.start,
                 {
-                    withCredentials: true,
                     params: { path, hint },
                 }
             );
@@ -52,7 +48,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 
     const { loading: signOutInProgress, execute: signOut } = useAsyncCallback(
         async () => {
-            await axiosInstance.get(signOutUrl, { withCredentials: true });
+            await axiosInstance.get(AuthRoute.signOut);
             location.href = '/';
         }
     );

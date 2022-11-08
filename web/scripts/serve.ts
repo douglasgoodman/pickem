@@ -49,8 +49,9 @@ serve(
 
             ignoreExtensions.forEach((extension) => {
                 if (req.url?.endsWith(extension)) {
-                    req.url = req.url.substring(req.url.lastIndexOf('/'));
-                    console.log('rewrite asset: ' + req.url);
+                    const newUrl = req.url.substring(req.url.lastIndexOf('/'));
+                    console.log(`Rewrite asset: ${req.url} => ${newUrl}`);
+                    req.url = newUrl;
                     rewrite = false;
                 }
             });

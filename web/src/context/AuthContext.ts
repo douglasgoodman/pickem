@@ -1,8 +1,10 @@
+import { AuthFetchResponse } from '@pickem/api-sdk';
 import React from 'react';
-import { UserDocument } from '@pickem/types';
+
+export type AuthenticatedUser = AuthFetchResponse;
 
 export interface AuthContextType {
-    user: UserDocument | undefined;
+    user: AuthenticatedUser | undefined;
     inProgress: boolean | undefined;
     signIn: (path?: string) => void;
     signOut: () => void;

@@ -2361,6 +2361,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pickem/api-sdk@workspace:^, @pickem/api-sdk@workspace:libs/api-sdk":
+  version: 0.0.0-use.local
+  resolution: "@pickem/api-sdk@workspace:libs/api-sdk"
+  dependencies:
+    typescript: ^4.8.3
+  languageName: unknown
+  linkType: soft
+
 "@pickem/api@workspace:api":
   version: 0.0.0-use.local
   resolution: "@pickem/api@workspace:api"
@@ -2370,6 +2378,7 @@ __metadata:
     "@aws-sdk/lib-dynamodb": 3.179.0
     "@aws-sdk/smithy-client": ^3.178.0
     "@aws-sdk/types": ^3.178.0
+    "@pickem/api-sdk": "workspace:^"
     "@pickem/types": "workspace:^"
     "@types/body-parser": ^1
     "@types/cookie-session": ^2
@@ -2382,6 +2391,7 @@ __metadata:
     dotenv: ^16.0.3
     esbuild: ^0.15.8
     express: ^4.18.2
+    google-auth-library: ^8.6.0
     googleapis: ^108.0.0
     morgan: ^1.10.0
     nodemon: ^2.0.20
@@ -2431,7 +2441,7 @@ __metadata:
     "@mui/icons-material": ^5.10.9
     "@mui/lab": ^5.0.0-alpha.106
     "@mui/material": ^5.10.12
-    "@pickem/types": "workspace:^"
+    "@pickem/api-sdk": "workspace:^"
     "@types/node": ^18.11.3
     "@types/qrcode": ^1
     "@types/react": ^18
@@ -4102,7 +4112,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"google-auth-library@npm:^8.0.2":
+"google-auth-library@npm:^8.0.2, google-auth-library@npm:^8.6.0":
   version: 8.6.0
   resolution: "google-auth-library@npm:8.6.0"
   dependencies:
